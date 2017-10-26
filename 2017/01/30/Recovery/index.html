@@ -1,0 +1,876 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="TUBcourse,DatabaseTechnology," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blackwhole" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="This chapter talks about how to do recovery when database system has crashes. To solve the atomicity and durability, we use logging. It mainly has Undo logging, Redo logging, and Undo/Redo logging. Un">
+<meta name="keywords" content="TUBcourse,DatabaseTechnology">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DBT 08 Recovery from system failures">
+<meta property="og:url" content="http://yoursite.com/2017/01/30/Recovery/index.html">
+<meta property="og:site_name" content="Blackwhole">
+<meta property="og:description" content="This chapter talks about how to do recovery when database system has crashes. To solve the atomicity and durability, we use logging. It mainly has Undo logging, Redo logging, and Undo/Redo logging. Un">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-02-15T08:37:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DBT 08 Recovery from system failures">
+<meta name="twitter:description" content="This chapter talks about how to do recovery when database system has crashes. To solve the atomicity and durability, we use logging. It mainly has Undo logging, Redo logging, and Undo/Redo logging. Un">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/30/Recovery/"/>
+
+
+
+
+
+  <title> DBT 08 Recovery from system failures | Blackwhole </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blackwhole</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/30/Recovery/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Jin HU">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Blackwhole">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Blackwhole" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                DBT 08 Recovery from system failures
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-30T22:33:06+01:00">
+                2017-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/notes/" itemprop="url" rel="index">
+                    <span itemprop="name">notes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>This chapter talks about how to do recovery when database system has crashes. To solve the atomicity and durability, we use logging. It mainly has Undo logging, Redo logging, and Undo/Redo logging. Undo logging records history value, commit after all changes write to the disk, ignore complete transactions; Redo logging records future value, commit before write to disk, ignore incomplete transactions and repeat complete transactions. We also use checkpoint in recovery only read certain transactions, also it allows other active transactions run when checkpointing.</p>
+<a id="more"></a>
+<h2 id="Failure-modes"><a href="#Failure-modes" class="headerlink" title="Failure modes"></a>Failure modes</h2><h3 id="Error-type"><a href="#Error-type" class="headerlink" title="Error type:"></a>Error type:</h3><ul>
+<li><p>transaction failure: </p>
+<p>  abort, error in application (like division<br>  by zero)</p>
+</li>
+<li><p>system failure: </p>
+<p>  crash in DBMS, OS, hardware<br>  data in main memory is lost</p>
+</li>
+<li><p>media failure: </p>
+<p>  head crash, catastrophy, data destroyed…</p>
+</li>
+</ul>
+<p>==&gt; <strong>solution: logging</strong> record what have done to the database, <em>solve atomicity and durability</em></p>
+<p>logging has three attributes, namely:</p>
+<ul>
+<li>rules</li>
+<li>recovery methods</li>
+<li>checkpoint</li>
+</ul>
+<h3 id="transactions-processing"><a href="#transactions-processing" class="headerlink" title="transactions processing"></a>transactions processing</h3><p>buffer manager, log manager</p>
+<ol>
+<li><p>transaction requests a database element from bufffer manager</p>
+</li>
+<li><p>buffermanager reqrieves from disk if needed</p>
+</li>
+<li><p>fetch element into local address space</p>
+</li>
+<li><p>modify or new element inside the address space</p>
+</li>
+<li><p>transaction returns new element to buffer manager</p>
+</li>
+<li><p>buffer manager writes element back to disk</p>
+</li>
+</ol>
+<h3 id="primitive-operations"><a href="#primitive-operations" class="headerlink" title="primitive operations"></a>primitive operations</h3><ul>
+<li><p>INPUT(X): copy X from disk into buffer</p>
+</li>
+<li><p>READ(X, t): Copy X from buffer into transaction address space</p>
+</li>
+<li><p>WRITE(X, t): copy value produced by t to element X</p>
+</li>
+<li><p>OUTPUT(X): copy containing X from buffer to disk</p>
+</li>
+</ul>
+<h2 id="undo-logging"><a href="#undo-logging" class="headerlink" title="undo logging"></a>undo logging</h2><h3 id="log-records"><a href="#log-records" class="headerlink" title="log records:"></a>log records:</h3><ul>
+<li><p>&lt; START T &gt;: start transaction T</p>
+</li>
+<li><p>&lt; T,X,v &gt;: the value v of database element X was changed by transaction T. (v is the history value)</p>
+</li>
+<li><p>&lt; COMMIT T &gt;: T complete, no further change</p>
+</li>
+<li><p>&lt; ABORT T &gt;: T has no effect on the disc</p>
+</li>
+<li><p>FLUSH LOG: ask buffer manager to write all log from blocks to disc</p>
+</li>
+</ul>
+<p><strong><em>undo logging</em>: record past value v of &lt; T,X,v &gt;, recover to the history value, read log from bottle to the bottom until find the place where crashes happen.</strong></p>
+<h3 id="Rules"><a href="#Rules" class="headerlink" title="Rules:"></a>Rules:</h3><ol>
+<li><p><em>&lt; COMMIT T &gt; after OUTPUT(X) to the disc</em></p>
+</li>
+<li><p><em>record &lt; T,X,v &gt; after changes done, before write new changes to the disc</em></p>
+</li>
+</ol>
+<h3 id="Recovery"><a href="#Recovery" class="headerlink" title="Recovery:"></a>Recovery:</h3><p>If crashes happen when:</p>
+<ol>
+<li><p>after FLUSH LOG —- do nothing because &lt; COMMIT T &gt; has been executed and changes in the disc</p>
+</li>
+<li><p>after &lt; COMMIT T&gt; before FLUSH LOG —- recovery to history value and write &lt; ABORT T &gt; to log then FLUSH LOG</p>
+</li>
+<li><p>write changes into disc —- take T as uncommitted, do same as above</p>
+</li>
+<li><p>record &lt; T,X,v &gt; —- do same as above </p>
+</li>
+</ol>
+<h3 id="checkpoint"><a href="#checkpoint" class="headerlink" title="checkpoint"></a>checkpoint</h3><p>BUT: we can find that use undo logging we need to <strong>read all logs</strong>, it cost a lot</p>
+<p>=&gt; So we use <strong>checkpoint</strong>, then we need to just recovery until we read &lt; CKPT &gt;</p>
+<p>BUT: database is blocked during the checkpoint, no new transactions will be accepted</p>
+<p>=&gt; checkpoint only for certain transactions, use &lt; START CKPT (T1, T2, … Tn) &gt; and <end ckpt=""></end></p>
+<p>reading from back to first, if we meet:</p>
+<ul>
+<li><p>first &lt; END CKPT &gt; : recovery only till next &lt; START CKPT &gt;</p>
+</li>
+<li><p>first &lt; START CKPT T1, …Tk &gt;, means we have system failure during checkpointing, T1 … Tk are the single active transaction at this time</p>
+</li>
+</ul>
+<h2 id="redo-logging"><a href="#redo-logging" class="headerlink" title="redo logging"></a>redo logging</h2><p><strong>record future value of an element, redo the changes</strong></p>
+<h3 id="Rule"><a href="#Rule" class="headerlink" title="Rule:"></a>Rule:</h3><ol>
+<li><p><em>use before write changes to disc</em></p>
+</li>
+<li><p><em>all logs of T and &lt; COMMIT T &gt; must be wrriten to disc</em></p>
+</li>
+</ol>
+<h3 id="redo-recovery-process"><a href="#redo-recovery-process" class="headerlink" title="redo recovery process"></a>redo recovery process</h3><p>if crashes happen when:</p>
+<ol>
+<li><p>write to disc, namely after FLUSH LOG: T will be regarded as committed, so redo the changes as the redo log state (maybe redundant)</p>
+</li>
+<li><p>At &lt; COMMIT T &gt; : if &lt; COMMIT T &gt; write to the disc, same above, else same below</p>
+</li>
+<li><p>before &lt; COMMIT T &gt;: T is not complete, do nothing and &lt; ABORT T &gt;</p>
+</li>
+</ol>
+<p>BUT: Although T is committed, it is possible that the change is not in the disc, namely crashes happen when OUTPUT.</p>
+<p>=&gt; write all database elements on disc during checkpointing that have been changed by committed but incomplete transactions, don’t need to wait all active transactions finished.</p>
+<h3 id="checkpoint-recovery"><a href="#checkpoint-recovery" class="headerlink" title="checkpoint recovery"></a>checkpoint recovery</h3><p>at &lt; END CKPT &gt;: All transactions committed before &lt; START CKPT (T1, T2,…, Tn) &gt; are on disc, but all T1 … Tk started after START are unsafe</p>
+<p>at &lt; START CKPT … &gt;: crashes occurred during checkpointing, search next &lt; END CKPT &gt;(backward), then continue to next &lt; START CKPT … &gt;, redo all transactions.</p>
+<p>redo after commit, if a transaction not commit, abort it.</p>
+<h2 id="undo-vs-redo"><a href="#undo-vs-redo" class="headerlink" title="undo vs. redo"></a>undo vs. redo</h2><ul>
+<li><p>undo logging: allowed to commit when all changes are on disk, write COMMIT to log after all values are on disk, log holds old values.<br><strong>Incomplete transactions are rolled back, complete transactions are ignored.</strong> </p>
+</li>
+<li><p>redo logging: allowed to commit when changes are on log, COMMIT is written to log before any value is written to disk, log holds new values.<br><strong>Incomplete transactions are ignored, complete transactions are repeated.</strong></p>
+</li>
+</ul>
+<p>drawbacks: </p>
+<ul>
+<li><p>undo log: Data must be written immediately after the end of a transaction – too many I/O</p>
+</li>
+<li><p>redo log: All data stay in the buffer till COMMIT – high requirements of memory</p>
+</li>
+</ul>
+<h2 id="undo-redo-logging"><a href="#undo-redo-logging" class="headerlink" title="undo/redo logging"></a>undo/redo logging</h2><p>flexible, but need to record more info in log.</p>
+<p>&lt; T,X,v,w &gt;: (v is the old value, w is the new value)</p>
+<p>Rule: Update log &lt; T,X,v,w &gt; must have been written to disc.</p>
+<p>Before X changed by T has written on disc, &lt; COMMIT T &gt; can be written on disc before/after OUTPUT.</p>
+<h3 id="Recovery-1"><a href="#Recovery-1" class="headerlink" title="Recovery"></a>Recovery</h3><p>Redo all committed transactions in time order.<br>Undo all uncommitted transactions in reverse time order.</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>For Undo logging, do nothing to transactions committed, do undone to transactions uncommitted.<br>FOr Redo logging, do nothing to transactions uncommitted, do redone to transactions committed.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TUBcourse/" rel="tag"># TUBcourse</a>
+          
+            <a href="/tags/DatabaseTechnology/" rel="tag"># DatabaseTechnology</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/02/concurrency/" rel="prev" title="DBT 07 Concurrency Control">
+                DBT 07 Concurrency Control <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq"
+               alt="Jin HU" />
+          <p class="site-author-name" itemprop="name">Jin HU</p>
+          <p class="site-description motion-element" itemprop="description">If you don't have ability, you will wind up playing in a rock band.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jinhu94" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/jin-hu-349633138/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Failure-modes"><span class="nav-number">1.</span> <span class="nav-text">Failure modes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Error-type"><span class="nav-number">1.1.</span> <span class="nav-text">Error type:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#transactions-processing"><span class="nav-number">1.2.</span> <span class="nav-text">transactions processing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#primitive-operations"><span class="nav-number">1.3.</span> <span class="nav-text">primitive operations</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undo-logging"><span class="nav-number">2.</span> <span class="nav-text">undo logging</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#log-records"><span class="nav-number">2.1.</span> <span class="nav-text">log records:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Rules"><span class="nav-number">2.2.</span> <span class="nav-text">Rules:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recovery"><span class="nav-number">2.3.</span> <span class="nav-text">Recovery:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#checkpoint"><span class="nav-number">2.4.</span> <span class="nav-text">checkpoint</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redo-logging"><span class="nav-number">3.</span> <span class="nav-text">redo logging</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Rule"><span class="nav-number">3.1.</span> <span class="nav-text">Rule:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redo-recovery-process"><span class="nav-number">3.2.</span> <span class="nav-text">redo recovery process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#checkpoint-recovery"><span class="nav-number">3.3.</span> <span class="nav-text">checkpoint recovery</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undo-vs-redo"><span class="nav-number">4.</span> <span class="nav-text">undo vs. redo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undo-redo-logging"><span class="nav-number">5.</span> <span class="nav-text">undo/redo logging</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Recovery-1"><span class="nav-number">5.1.</span> <span class="nav-text">Recovery</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">6.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin HU</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

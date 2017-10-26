@@ -1,0 +1,857 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="TUBcourse,Distributed Algorithm," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blackwhole" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Explain the Echo/Broadcast/Flooding algorithm. What are the differences? What is the message complexity?  Overview: Flooding:distribute info, with/without confirmation, all nodes and edges Echo:distr">
+<meta name="keywords" content="TUBcourse,Distributed Algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Distributed Algorithm C3 -- Flooding, Broadcast and Echo">
+<meta property="og:url" content="http://yoursite.com/2017/03/02/DAlg-notes-C3/index.html">
+<meta property="og:site_name" content="Blackwhole">
+<meta property="og:description" content="Explain the Echo/Broadcast/Flooding algorithm. What are the differences? What is the message complexity?  Overview: Flooding:distribute info, with/without confirmation, all nodes and edges Echo:distr">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-03-08T08:37:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Distributed Algorithm C3 -- Flooding, Broadcast and Echo">
+<meta name="twitter:description" content="Explain the Echo/Broadcast/Flooding algorithm. What are the differences? What is the message complexity?  Overview: Flooding:distribute info, with/without confirmation, all nodes and edges Echo:distr">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/02/DAlg-notes-C3/"/>
+
+
+
+
+
+  <title> Distributed Algorithm C3 -- Flooding, Broadcast and Echo | Blackwhole </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blackwhole</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/02/DAlg-notes-C3/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Jin HU">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Blackwhole">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Blackwhole" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Distributed Algorithm C3 -- Flooding, Broadcast and Echo
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-02T09:33:11+01:00">
+                2017-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/notes/" itemprop="url" rel="index">
+                    <span itemprop="name">notes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <ul>
+<li>Explain the Echo/Broadcast/Flooding algorithm.</li>
+<li>What are the differences?</li>
+<li>What is the message complexity?</li>
+</ul>
+<p>Overview:</p>
+<p>Flooding:distribute info, with/without confirmation, all nodes and edges</p>
+<p>Echo:distribute info, all nodes and edges, selective confirmation, collect info, spanning tree</p>
+<p>Broadcast:distribute, all nodes, without acknowledgement with special topologies</p>
+<p>Multicast: distribute, specific group, with/without acknowledgement</p>
+<a id="more"></a>
+<h2 id="Flooding"><a href="#Flooding" class="headerlink" title="Flooding"></a>Flooding</h2><p>Precondition: connected topology.</p>
+<p>Principle: <strong>Each node tells a new rumor that it got from one of its neighbors to all other neighbors, until all nodes are informed, already known rumors are ignored.</strong></p>
+<p>Initially, <code>informed == FALSE</code> for all processes.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">I:  informed == FALSE</div><div class="line">    SEND &lt;INFO&gt; TO all neighbors</div><div class="line">    informed = TRUE;</div><div class="line">R:  &#123;A message &lt;info&gt; received&#125;</div><div class="line">	IF NOT informed, then:</div><div class="line">		SEND &lt;INFO&gt; TO all other neighbors;</div><div class="line">		informed = TRUE;</div><div class="line">	FI</div></pre></td></tr></table></figure>
+<p><em>Are several competing initiators allowed???</em></p>
+<h3 id="evaluation-of-flooding"><a href="#evaluation-of-flooding" class="headerlink" title="evaluation of flooding"></a>evaluation of flooding</h3><p>suppose $n$ nodes and $e$ edges.</p>
+<ul>
+<li><p>how many messages are sent?</p>
+<p>1) each node sends message to all its incident edges: $2e$</p>
+<p>2) except the node which sent message to itself: $-n$</p>
+<p>3) except the initator: $+1$</p>
+<p>Thus, $2e-n+1$ messages are sent.</p>
+</li>
+<li><p>how to determine the termination? </p>
+<p>=&gt; Confirmation</p>
+</li>
+</ul>
+<h3 id="flooding-with-confirmation"><a href="#flooding-with-confirmation" class="headerlink" title="flooding with confirmation"></a>flooding with confirmation</h3><p>Two types of messages: <em>Explorers</em>, <em>confirmations</em></p>
+<p>A process acknowledges an explorer with a confirmation, when it receives all confirmations for the explorers it sent.</p>
+<p>If this process received the explorer for the first time, it sent confirmation after arrival of #neighbor -1 receipts, if it is leaf or received further explorer, sent confirmation immediately.</p>
+<p>If the initiator received a confirmation from every neighbor, algorithm terminates.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">I:  &#123;Not informed&#125; // executed by the initiator</div><div class="line">	SEND &lt;Explorer&gt; TO all neighbors;</div><div class="line">	informed = TRUE;</div><div class="line">R:  &#123;explorer from neighbor N is received&#125;</div><div class="line">	IF NOT informed, then:</div><div class="line">		SEND &lt;Explorer&gt; TO all neighbors except N;</div><div class="line">		informed = TRUE;</div><div class="line">		A = N;</div><div class="line">	ELSE:</div><div class="line">		SEND Confirmation to N;</div><div class="line">	FI</div><div class="line">	</div><div class="line">	&#123;Confirmation is received&#125;</div><div class="line">	Count = Count + 1;</div><div class="line">	IF (NOT Initiator) &amp;&amp; (Count == #Neighbors -1), then:</div><div class="line">		SEND Confirmation TO Neighbor A;</div><div class="line">	FI</div><div class="line">	IF Initiator &amp;&amp; (Count == #Neighbors), then:</div><div class="line">		Exit;</div><div class="line">	FI</div></pre></td></tr></table></figure>
+<h3 id="evaluation-of-flooding-with-confirmation"><a href="#evaluation-of-flooding-with-confirmation" class="headerlink" title="evaluation of flooding with confirmation"></a>evaluation of flooding with confirmation</h3><ul>
+<li><p>how many explorers altogether?</p>
+<p>every node sends explorers to its neighbors: $2e$ explorers</p>
+<p>not include its activation edge: $-n$ explorers</p>
+<p>except the initiator: $+1$ explorer</p>
+<p>total: $2e - n + 1$ explorer</p>
+</li>
+<li><p>how many confirmations altogether?</p>
+<p>$2e - n + 1$ confirmations</p>
+</li>
+<li><p>how many messages altogether?</p>
+<p>$4e - 2n + 2$ messages</p>
+</li>
+</ul>
+<h2 id="Echo"><a href="#Echo" class="headerlink" title="Echo"></a>Echo</h2><p>Begin with the initiator, it sends explorers to all its neighbors. If a node received the explorer for the first time, it records the activation edge and sends explorers to all its neighbors. If two explorers meet on an edge, the explorers are swallowed. </p>
+<p>For a node have received an explorer before, if it receives an explorer or echo over all its edges, then it sends echo over its activation edge, leaf nodes immediately send echo when receive an explorer.</p>
+<p>The algorithm terminates when the initiator receive echo.</p>
+<p>Exactly two messages run over every edge.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">I:  &#123;NOT informed&#125; // executed by the initiator</div><div class="line">	SEND &lt;EXPLORER&gt; to all its neighbors</div><div class="line">	informed = True;</div><div class="line">R:  &#123;a message from neighbor N is received&#125;</div><div class="line">	IF NOT informed, then:</div><div class="line">		SEND &lt;Explorer&gt; to all other neighbors except N;</div><div class="line">		informed = TRUE;</div><div class="line">		A = N;</div><div class="line">	FI</div><div class="line">	count = count + 1;</div><div class="line">	IF count == #neighbors, then:</div><div class="line">		IF NOT Initiator:</div><div class="line">			SEND &lt;ECHO&gt; TO neighbor A;</div><div class="line">		ELSE:</div><div class="line">			EXIT;</div><div class="line">		FI</div><div class="line">	FI</div></pre></td></tr></table></figure>
+<h3 id="Evaluation-of-echo"><a href="#Evaluation-of-echo" class="headerlink" title="Evaluation of echo"></a>Evaluation of echo</h3><p>every node sends an explorer on all edges -&gt; $2e$ explorer</p>
+<p>exception activation edge -&gt; $-n$ explorer</p>
+<p>except the initiator -&gt; $+1$ explorer</p>
+<p>every node sends an echo on the activation edge -&gt; $+n$ echos</p>
+<p>except the initiator -&gt; $-1$ echo</p>
+<p>totally, $2e$ messages.</p>
+<h3 id="Characteristics-and-Difference-with-flooding"><a href="#Characteristics-and-Difference-with-flooding" class="headerlink" title="Characteristics and Difference with flooding"></a>Characteristics and Difference with flooding</h3><p>Echo is a <em>wave algorithm</em></p>
+<ul>
+<li>Distribution of information (to all nodes over all edges)</li>
+<li>Collecting of information (of potentially all nodes over the activation edges)</li>
+</ul>
+<p>与flooding with confirmation相比，对于二者的节点来说，如果都是第一次收到explorer，会将explorer发给所有其他邻居；在confirm阶段，echo算法中节点只会将确认消息echo回给第一个给它发explorer的节点，而在flooding算法中，节点会发送confirmation给每一个给它发过explorer的节点以确认它收到了explorer。采用echo算法可以少发一些message。</p>
+<p>Echo-edges form a spanning tree, the spanning tree looks different due to the message delays</p>
+<h3 id="improvement-of-Echo-algorithm"><a href="#improvement-of-Echo-algorithm" class="headerlink" title="improvement of Echo algorithm"></a>improvement of Echo algorithm</h3><p>Idea: avoid visit nodes which are known to be visited by other explorers. 减少echo算法中发送的explorer数量。</p>
+<p>implement: Together with an explorer, a set of taboo nodes $z$ is sent and received.</p>
+<p>$z = <neighbors of="" initators=""> \cup <initiator>$</initiator></neighbors></p>
+<p>Explorers only sent to neighbors set $y$ which is not included in z</p>
+<p>Thus, the new taboo nodes set $z’ = z \cup y$</p>
+<h2 id="Broadcast"><a href="#Broadcast" class="headerlink" title="Broadcast"></a>Broadcast</h2><p>sending of a message to all nodes, optionally with confirmation.</p>
+<p>flooding algorithm is especially fault-tolerant because all edges are used for distribution of information, it is suitable for any connected undirected topology.</p>
+<p>However, when focus on some specific topology, we don’t need to use all edges to send information, a broadcast with less messages is possible. For aimed case, each node is only reached over a single edge, only $n-1$ messages.</p>
+<ul>
+<li>Broadcast on unidirectional rings: all nodes are informed when the initiator receive the token again, $n$ messages.</li>
+<li>Broadcast on Trees: Tree has $n-1$ edges (spanning tree?)</li>
+<li>Broad cast on Hypercubes: time complexity – $d$ (#dimension) cycles; Message complexity: $n-1$</li>
+</ul>
+<h2 id="Multicast"><a href="#Multicast" class="headerlink" title="Multicast"></a>Multicast</h2><p>pairwise exchange messages is not optimal if communications are between a sender and many receivers.</p>
+<p><em>Multicast operatioin</em> is to send a single message from one process to each member of a group processes (if send know its members who are in same group…)</p>
+<p>Why multicast? </p>
+<ul>
+<li>Fault tolerance: client requests are multicast to a group of identical, replicated servers, even a server failed, the client still can be served.</li>
+<li>Service discovery: use multicast we can discover services</li>
+<li>Better performance through replicated data: multicast messages can be used to propagate changes to all copies.</li>
+<li>event notifications: notify a group of processes when a new event happened.</li>
+</ul>
+<h3 id="Reliable-IP-Multicast"><a href="#Reliable-IP-Multicast" class="headerlink" title="Reliable IP Multicast"></a>Reliable IP Multicast</h3><p>can be implemented using <em>piggybacked acknowledgements and negative acknolwedgements</em></p>
+<ul>
+<li>piggyback ack: ack of delivery is attached to other message</li>
+<li>negative ack: ack notify other process that a message is missing</li>
+<li>use “deliver” instead of “receive”</li>
+</ul>
+<p>$S^p_g$ is denoted as the sequence number of process $p$ in group $g$, we can take it as how many messages this process multicast.</p>
+<p>$R^q_g​$ is denoted as the sequence number(the number of messages) that current process delivered(received) from process $q​$ in group $g​$.</p>
+<p>for a specific process $p1, p2, p3$ in group $g$, their $S^p_g$ and $R^q_g$ are all set to 0 initially.</p>
+<ol>
+<li>if $p1$ multicast a message, $S^{p1}_g$ will add 1.</li>
+<li>then $p1, p2, p3$ received the message multicast from $p1$, $p2$’s $R^{p1}_g$ and $p3$’s $R^{p1}_g$ will both add 1.</li>
+<li>After that, if $p2$ wants to multicast a message $m$, it piggybacks its sequence number $S^{p2}_g$ and a set of acknowledgements of the form $<q, r^q_g="">$, like $ m = { payload, 0, <1, 1=""> } $ </1,></q,></li>
+<li>$p3$ and $p1$ received new message from $p2$, they will compare the piggybacked sequence number with their own $R^{p2}_g$ </li>
+<li>take $p3$ as example, if $p3$’s $R^{p2}_g $ equals to the sequence number $S^{p2}_g$ of $p2$, the message will be delivered; if $S^{p2}_g \le R^{p2}_g$ (p2发出的比p3收到的少), the message has been seen before and is discarded; if $S^{p2}_g \ge R^{p2}_g$ (p2发出的比p3收到的多，可能有消息丢失), the message is stored in a <em>hold-back queue</em> and missing message are requested before delivery, then a negative ack is sent to either the sender or any other process which have delivered the missing message.<br>​</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TUBcourse/" rel="tag"># TUBcourse</a>
+          
+            <a href="/tags/Distributed-Algorithm/" rel="tag"># Distributed Algorithm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/12/HSIreview/" rel="next" title="Review of HSI">
+                <i class="fa fa-chevron-left"></i> Review of HSI
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/03/DAlg-notes-C4/" rel="prev" title="Distributed Algorithm C4 -- Election Algorithms">
+                Distributed Algorithm C4 -- Election Algorithms <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq"
+               alt="Jin HU" />
+          <p class="site-author-name" itemprop="name">Jin HU</p>
+          <p class="site-description motion-element" itemprop="description">If you don't have ability, you will wind up playing in a rock band.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jinhu94" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/jin-hu-349633138/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Flooding"><span class="nav-number">1.</span> <span class="nav-text">Flooding</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#evaluation-of-flooding"><span class="nav-number">1.1.</span> <span class="nav-text">evaluation of flooding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flooding-with-confirmation"><span class="nav-number">1.2.</span> <span class="nav-text">flooding with confirmation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#evaluation-of-flooding-with-confirmation"><span class="nav-number">1.3.</span> <span class="nav-text">evaluation of flooding with confirmation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Echo"><span class="nav-number">2.</span> <span class="nav-text">Echo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Evaluation-of-echo"><span class="nav-number">2.1.</span> <span class="nav-text">Evaluation of echo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Characteristics-and-Difference-with-flooding"><span class="nav-number">2.2.</span> <span class="nav-text">Characteristics and Difference with flooding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#improvement-of-Echo-algorithm"><span class="nav-number">2.3.</span> <span class="nav-text">improvement of Echo algorithm</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Broadcast"><span class="nav-number">3.</span> <span class="nav-text">Broadcast</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Multicast"><span class="nav-number">4.</span> <span class="nav-text">Multicast</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Reliable-IP-Multicast"><span class="nav-number">4.1.</span> <span class="nav-text">Reliable IP Multicast</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin HU</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

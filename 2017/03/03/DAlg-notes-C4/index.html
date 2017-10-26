@@ -1,0 +1,900 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="TUBcourse,Distributed Algorithm," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blackwhole" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="• Why do we need election algorithms?• Which election algorithms do you know?• Explain the … algorithm.• What are the drawbacks of this algorithm and can it be improved?• What is the message complexit">
+<meta name="keywords" content="TUBcourse,Distributed Algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Distributed Algorithm C4 -- Election Algorithms">
+<meta property="og:url" content="http://yoursite.com/2017/03/03/DAlg-notes-C4/index.html">
+<meta property="og:site_name" content="Blackwhole">
+<meta property="og:description" content="• Why do we need election algorithms?• Which election algorithms do you know?• Explain the … algorithm.• What are the drawbacks of this algorithm and can it be improved?• What is the message complexit">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-03-08T08:38:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Distributed Algorithm C4 -- Election Algorithms">
+<meta name="twitter:description" content="• Why do we need election algorithms?• Which election algorithms do you know?• Explain the … algorithm.• What are the drawbacks of this algorithm and can it be improved?• What is the message complexit">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/03/DAlg-notes-C4/"/>
+
+
+
+
+
+  <title> Distributed Algorithm C4 -- Election Algorithms | Blackwhole </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blackwhole</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/03/DAlg-notes-C4/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Jin HU">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Blackwhole">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Blackwhole" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Distributed Algorithm C4 -- Election Algorithms
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-03T09:34:12+01:00">
+                2017-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/notes/" itemprop="url" rel="index">
+                    <span itemprop="name">notes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>• Why do we need election algorithms?<br>• Which election algorithms do you know?<br>• Explain the … algorithm.<br>• What are the drawbacks of this algorithm and can it be improved?<br>• What is the message complexity of this algorithm.</p>
+<p>Election algorithms for</p>
+<ul>
+<li>arbitrary connected topologies</li>
+<li>unidirectional and bidirectional rings</li>
+<li>trees</li>
+</ul>
+<p>Randomized election algorithms for</p>
+<ul>
+<li>bidirectional rings</li>
+<li>anonymous rings</li>
+</ul>
+<a id="more"></a>
+<h2 id="The-election-problem"><a href="#The-election-problem" class="headerlink" title="The election problem"></a>The election problem</h2><p>Select a <em>unique</em> leader from a set of identical processes, assume that each node has a unique integer identity &gt; 0.</p>
+<p>It requires each node shall know the winner in the end, also everyone can initiate the algorithm. For example, determine the largest identity in the topology can be used as election algorithm.</p>
+<h2 id="Election-for-arbitrary-topologies"><a href="#Election-for-arbitrary-topologies" class="headerlink" title="Election for arbitrary topologies"></a>Election for arbitrary topologies</h2><p>We suppose that each process has a unique identity $p$ and a local variable $M_p$ , which is 0 initially.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Ip: &#123;Mp == 0&#125;</div><div class="line">	Mp = p</div><div class="line">	SEND &lt;Mp&gt; TO all neighbors</div><div class="line">Rp: &#123;A message &lt;j&gt; has arrived&#125;</div><div class="line">	IF Mp &lt; j, THEN:</div><div class="line">		Mp = j;  </div><div class="line">		SEND &lt;Mp&gt; to all other neighbors</div><div class="line">Tp: &#123;termination was discovered&#125;</div><div class="line">	IF Mp == p, THEN:</div><div class="line">		&quot;I am the master&quot;</div><div class="line">	ELSE:</div><div class="line">		&quot;Mp is the master&quot;</div><div class="line">	FI</div></pre></td></tr></table></figure>
+<p><strong>???Mp = p for every node, or each node initiates this algorithm at the same time???</strong></p>
+<h3 id="Echo-election-algorithm"><a href="#Echo-election-algorithm" class="headerlink" title="Echo election algorithm"></a>Echo election algorithm</h3><p>Echo election algorithm is suitable for arbitrary connected topologies. </p>
+<p>Each initiators starts an instance of this algorithm, the explorer and echo carry the identity of the initiators, weaker messages are not passed (message extinction), strongest wave prevails and terminates at the winner, so the winner know it has won. If a initiator receives a stronger message, it knows that it has lost the election, stronger initiators will not send echo for it.</p>
+<p>The winner starts the echo algorithm again to tell other it has won, and other waves finally stagnate somewhere.</p>
+<h3 id="Election-Algorithms-for-unidirectional-Rings"><a href="#Election-Algorithms-for-unidirectional-Rings" class="headerlink" title="Election Algorithms for unidirectional Rings"></a>Election Algorithms for unidirectional Rings</h3><h4 id="Bully-algorithm"><a href="#Bully-algorithm" class="headerlink" title="Bully- algorithm"></a>Bully- algorithm</h4><p>Each process wakes up as an initiator or receives a message from its neighbor. </p>
+<p>Each waking up starts a complete ring circulation.</p>
+<p>Finally, each node receives a message with its own identity and the largest node’s ID.</p>
+<p>If both IDs are same, namely in the final message of each nodes $<i, j="">$, $i = j$, then the node is the master, otherwise it has lost.</i,></p>
+<p>For every circulation of each process:</p>
+<ol>
+<li><p>Each node holds its identity value $p$. The initiator sends a message like $<i, j="">$ to its next node, $i$ is its identity value, $j$ is the highest value currently.</i,></p>
+</li>
+<li><p>When a node receives a message:</p>
+<p>firstly it compares $i$ and its $p$ to check if a cycle of message exchange has finished. </p>
+<ul>
+<li>If not, then it compares the current highest value in the message $j$ to its identity value $p$, find the largest between $j$ and $p$, $k = max(j, p)$, and send message $<i, k="">$ to the next node.</i,></li>
+<li>Else, this node compares the current highest value in the message $j$ to its own value $p$, if they are equal, then this node is the master, else, the node hold the value $j$ is the master.</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Ip: &#123;init == FALSE&#125;</div><div class="line">	init = TRUE;</div><div class="line">	SEND &lt;p, p&gt; TO next node.</div><div class="line">    # the first p is the sender ID, and the second p is highest ID known</div><div class="line">Rp: &#123;A message &lt;i, j&gt; has arrived&#125;</div><div class="line">	IF i != p, THEN:</div><div class="line">		k = max(j, p);</div><div class="line">		SEND &lt;i, k&gt; TO next node;</div><div class="line">	ELSE:</div><div class="line">		IF p == j, THEN:</div><div class="line">			&apos;I am the master&apos;</div><div class="line">		ELSE:</div><div class="line">			&apos;j is the master&apos;</div><div class="line">		FI</div><div class="line">	FI</div></pre></td></tr></table></figure>
+<h5 id="complexity"><a href="#complexity" class="headerlink" title="complexity"></a>complexity</h5><p>We need $n$ complete circulations.</p>
+<p>$n^2$ single messages totally. The message complexity is $O(n^2)$.</p>
+<h5 id="drawbacks-and-improvements"><a href="#drawbacks-and-improvements" class="headerlink" title="drawbacks and improvements"></a>drawbacks and improvements</h5><p>Only winners know it has won, we can add an extra round to inform all other nodes.</p>
+<p>In this method, messages cannot lead to a win are passed on.</p>
+<p>=&gt; We can use message extinction to fix these two problems.</p>
+<h4 id="message-extinction-Chang-and-Roberts"><a href="#message-extinction-Chang-and-Roberts" class="headerlink" title="message extinction (Chang and Roberts)"></a>message extinction (Chang and Roberts)</h4><p>every node initiates a ring circuit, send its value to the next node, if its value larger than the next node’s, pass the value to the next after that, else this message will be swallowed. If a node can receive a message includes a value equal to its own value, that means this node is the master.</p>
+<h5 id="features"><a href="#features" class="headerlink" title="features"></a>features</h5><ul>
+<li>messages are only passed on if they can lead to a win, all other messages are extinct</li>
+<li>only the winner receives its own message, use an additional ring circulation to inform other nodes that it won.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Ip: &#123;Mp == 0&#125;</div><div class="line">	Mp = p;</div><div class="line">	SEND &lt;Mp&gt; TO next node;</div><div class="line">Rp: &#123;message &lt;j&gt; has arrived&#125;</div><div class="line">	IF Mp &lt; j, THEN:</div><div class="line">		Mp = j;</div><div class="line">		SEND &lt;Mp&gt; TO next node;</div><div class="line">	FI</div><div class="line">	IF j == p, THEN:</div><div class="line">		&apos;I am the master&apos;</div><div class="line">		&lt;inform others by another ring circuit&gt;</div><div class="line">	FI</div></pre></td></tr></table></figure>
+<h5 id="Message-complexity"><a href="#Message-complexity" class="headerlink" title="Message complexity"></a>Message complexity</h5><ol>
+<li><p>worst case message complexity with k initiators happens when initiators are arranged on the ring in descending order and initiate election in ascending order. (消息传递的方向与节点值增大的方向相反)</p>
+<p>suppose we have n nodes:</p>
+<p>​            k-largest initiator, $n-(k-1)$ messages;</p>
+<p>​            …</p>
+<p>​            2nd largest initiator, $n-1$ messages;</p>
+<p>​            1st largest initiator, $n$ messages;</p>
+<p>​    Thus, the message volume with k initiators in worst case is:</p>
+<p>​          $ n + (n-1) + (n-2) + (n-3) + … + (n-(k-1))$</p>
+<p>​$= \frac{n(n+1)}{2} - \frac{(n-k)(n-k+1)}{2} $</p>
+<p>​$= nk - \frac{k(k-1)}{2}$</p>
+<p>​==&gt; $O(n^2)$ with ring size $n$ and $k=n$  plus $n$ additional messages for win notification</p>
+</li>
+</ol>
+<ol>
+<li>for the best case, if the initiators are arranged on the ring in ascending order and initiate the election approximately simultaneously, except the largest initiator need $n$ messages, others only need 1 message. Thus the message volume is $ n+k-1$ plus $n$ additional messages. The message complexity is $O(n)$.</li>
+<li>Average case. For i-largest initiator, needs $n/i$ messages on average. So the average-case message complexity is $nH_k \approx n lnk$ , with $H_k = 1+1/2+…+1/k$ , still need $n$ messages for winner notification.</li>
+</ol>
+<h5 id="Influence-of-message-overtaking"><a href="#Influence-of-message-overtaking" class="headerlink" title="Influence of message overtaking"></a>Influence of message overtaking</h5><h2 id="Election-algorithms-for-Bidirectional-rings"><a href="#Election-algorithms-for-Bidirectional-rings" class="headerlink" title="Election algorithms for Bidirectional rings"></a>Election algorithms for Bidirectional rings</h2><h3 id="Hirschberg-Sinclair-Election-Algorithm"><a href="#Hirschberg-Sinclair-Election-Algorithm" class="headerlink" title="Hirschberg-Sinclair-Election Algorithm"></a>Hirschberg-Sinclair-Election Algorithm</h3><p>In this algorithm, each node try to compare its value to its right $2^{i-1}​$ neighbors and left $2^{i-1}​$ neighbors ($i = 1,2,3…​$, left and right neighbors totally $2^i​$) on a bidirectional ring until message arrives again at the node; node survived if it is larger than both two sides neighbors, and it receives an OK if it is larger than one neighbor, if node receive 2 OK in one phase, then it survived, else its state turns to passive from active.</p>
+<h4 id="worst-case-message-complexity"><a href="#worst-case-message-complexity" class="headerlink" title="worst case message complexity"></a>worst case message complexity</h4><p>Suppose we have n nodes in a ring:</p>
+<p>​    After phase 1, 1 passive process between active processes, max. $\frac{n}{2}$ nodes survive</p>
+<p>​    After phase 2, 2 passive between active, max. $\frac{n}{3}$ survive</p>
+<p>​    After phase 3, 4 passive between active, max. $\frac{n}{5}$ survive</p>
+<p>=&gt; there will be $2^{i-1}$ passive processes between active processes after phase $i$, max. $\frac{n}{1+2^{i-1}}$  nodes survive.</p>
+<p>=&gt;<strong>??? $\frac{n}{1+2^{i-1}}$ processes(nodes) can initiate chains with the length $2i$ </strong></p>
+<p>Each chain with the length $2i$ generates at most $4*2i$ messages</p>
+<p>in phase i, there are max $\frac{4 \times 2^i \times n}{1+2{i-1}} = \frac{2^{i-1} \ times 8n}{1+2^{i-1}} &lt; 8n$ messages.</p>
+<p>There are maximal $1+log2n$ phases, thus at the most $8n + 8nlog2n$ messages, which has the time complexity $O(nlogn)$, also need $n$ messages for win notification.</p>
+<p><strong>???time complexity $4n-2$ for $n=2k$ (worst case) and $6n-6$ for $n=2k+1$ (best case)???</strong></p>
+<h4 id="drawbacks-and-improvements-1"><a href="#drawbacks-and-improvements-1" class="headerlink" title="drawbacks and improvements"></a>drawbacks and improvements</h4><p>Drawback: The initiator do not have to proceed the phases synchronously, thus an initiator which is already in a high phase can still stopped by a new larger initiator.</p>
+<p>Improvement: pairs are used and ordered lexicographically rather than by node identities only.</p>
+<ul>
+<li>an initiator in a higher phase always prevails against an initiator in a lower phase, only if the phase is the same the node identity can be a tie breaker.</li>
+<li>the algorithm is no longer a MAX-algorithm, it does not necessarily determine the node with the highest id as the winner.</li>
+</ul>
+<h3 id="Peterson-Election-Algorithm"><a href="#Peterson-Election-Algorithm" class="headerlink" title="Peterson Election Algorithm"></a>Peterson Election Algorithm</h3><p>和HS算法的区别在哪？？？？</p>
+<p>In the beginning, all processes are active.</p>
+<p>For each phase:</p>
+<ul>
+<li>Each active process communicates its IDs to the next active process in both directions.</li>
+<li>Process receives higher ID become passive and only pass messages on</li>
+<li>Only active processes participate in the next phase</li>
+</ul>
+<p>A node wins when it receives its own ID.</p>
+<p>Additionally, a circulation for the win notification with $n$ messages.</p>
+<h4 id="worst-case-message-complexity-1"><a href="#worst-case-message-complexity-1" class="headerlink" title="worst-case message complexity"></a>worst-case message complexity</h4><p>If a node survives, its neighbors do not survive.</p>
+<p>In each phase, the number of active processes is at least halved, which means there are maximal $log_2n + 1$ phases.</p>
+<p>Each node sends at most $2$ messages per phase, so $2n$  messages per phase at most.</p>
+<p>=&gt; Worst case message complexity: $2n(log_2n +1)$</p>
+<h4 id="Best-case-message-complexity"><a href="#Best-case-message-complexity" class="headerlink" title="Best-case message complexity"></a>Best-case message complexity</h4><p>If each node has one neighbor whose ID is higher than its ID in the first phase, then there is at most 2 phases to terminate the algorithm with $2n$ messages each.</p>
+<p>=&gt; At most $4n$ messages. </p>
+<blockquote>
+<p>????The message sent from the largest to the smallest node circulates the ring -&gt; n messages</p>
+<p>????all other messages go only to their respective neighbor -&gt; 2n-1 messages</p>
+<p>????The algorithm terminates after only one phase, msg complexity is $3n-1$</p>
+</blockquote>
+<h4 id="Average-case-message-complexity"><a href="#Average-case-message-complexity" class="headerlink" title="Average-case message complexity"></a>Average-case message complexity</h4><p>First, arrange all nodes from largest to smallest. Then for each node, calculate the probability of it is smaller than the left neighbor and right neighbor, multiply these two probability value to get the probability this node is smaller than its two neighbors. Next, calculate the mean value of these probability that a node is smaller than both-side neighbors.</p>
+<p>=&gt; A node survives a phase with the probability 1/3, and  $(log_3n+1)$ phases on average.</p>
+<p>=&gt; Average-case is $2n(log_3n +1)$</p>
+<h3 id="Unidirectional-Peterson-Election"><a href="#Unidirectional-Peterson-Election" class="headerlink" title="Unidirectional Peterson Election???"></a>Unidirectional Peterson Election???</h3><p>An active node compares its value with the value of the next active predecessor and the value of the next active successor. If it has the largest ID, it remains active, otherwise it becomes passive. 往一个方向的后继的两个节点发送当前节点的id</p>
+<p>But on unidirectional rings messages can only be sent forward.</p>
+<p>Solution: </p>
+<ul>
+<li>The IDs of the active predecessor and the current node are transmitted to the active successor, stored in the variables $v$ and $p$.</li>
+<li>The comparison of the values with the own IDs is carried out by the successor.</li>
+<li>If $v&gt;max(p,s)$ , it remains active and joins the next phase. (从左到右三个节点，分别有值p, v, s， 如果v比p和s都大，那么这个节点存活并进入下一阶段 )</li>
+</ul>
+<h2 id="Election-Algorithms-on-Trees"><a href="#Election-Algorithms-on-Trees" class="headerlink" title="Election Algorithms on Trees"></a>Election Algorithms on Trees</h2><h3 id="Three-phases"><a href="#Three-phases" class="headerlink" title="Three phases:"></a>Three phases:</h3><ol>
+<li>Explosion phase: Election request is propagated to the leafs.<ul>
+<li>The explosion starts at several initiators</li>
+<li>If a node receives a explosion message for the first time, it will pass it on to all other neighbors</li>
+<li>The explosion waves unite when explosion messages meets on the same edge</li>
+</ul>
+</li>
+<li>Contraction phase: from the leafs the maximum of the already collected identities is propagated to the center.<ul>
+<li>If a leaf node receives a explosion message, it will answer with its own identity immediately</li>
+<li>If it is not a leaf node, it will compare the identities it received and its own identity, and send the max one over the last remaining edge.</li>
+<li>In the end, two different max identity will meet on the same edge, both received nodes know the real maximum afterwards</li>
+</ul>
+</li>
+<li>Information phase: Distribution of the real maximum from the center to all nodes in the network.<ul>
+<li>from both nodes the maximum is flooded into the network, the edge between them is omitted.</li>
+</ul>
+</li>
+</ol>
+<h3 id="message-complexity-with-k-initiators"><a href="#message-complexity-with-k-initiators" class="headerlink" title="message complexity with k initiators"></a>message complexity with k initiators</h3><p>We assume that there are $n$ edges and $k$ initiators.</p>
+<ul>
+<li>explosion phase: one message over each edge, except 2 messages over $k-1$ <strong>meeting edges(???)</strong>, so the number of messages in this phase is $n-2+k$.</li>
+<li>contraction phase: one message over each edge, two messages over the central edge, in total $ (n-1)-1=n-2$ messages.</li>
+<li>information phase: one message over each edge, but no message over the central edge, totally $n$ messages.</li>
+</ul>
+<p>Altogether $3n + k -4$ messages.</p>
+<p>Obviously, Election on trees is more efficient that Election on rings.</p>
+<h2 id="Randomized-Election-Algorithms"><a href="#Randomized-Election-Algorithms" class="headerlink" title="Randomized Election Algorithms"></a>Randomized Election Algorithms</h2><p>Randomized algorithms are often more simple than deterministic algorithms that solve the same problem. Some problems can be solved more efficiently via randomized algorithms.</p>
+<p>There are two categories of randomized algorithms, respectively <em>Las Vegas-Algorithms</em> and <em>Monte Carlo-algorithms</em>. For Las Vegas-algorithms, they are weakening of the termination, provide correct result, but the worst-case time complexity is unlimited. While Monte Carlo-algorithms are weakening partial correctness, but the worst-case run time is limited. </p>
+<p>(Las Vegas算法保证准确性但时间复杂度高，Monte Carlo算法保证效率但可能会出错)</p>
+<h3 id="Randomized-Election-in-Bidirectional-Rings"><a href="#Randomized-Election-in-Bidirectional-Rings" class="headerlink" title="Randomized Election in Bidirectional Rings"></a>Randomized Election in Bidirectional Rings</h3><p>Here, the average-case message complexity for $k=n$ is about $0.71n ln \ n$ . About 30% better than deterministic algorithm for unidirectional rings by Chang and Roberts.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TUBcourse/" rel="tag"># TUBcourse</a>
+          
+            <a href="/tags/Distributed-Algorithm/" rel="tag"># Distributed Algorithm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/02/DAlg-notes-C3/" rel="next" title="Distributed Algorithm C3 -- Flooding, Broadcast and Echo">
+                <i class="fa fa-chevron-left"></i> Distributed Algorithm C3 -- Flooding, Broadcast and Echo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/04/DAlg-notes-C5/" rel="prev" title="Distributed Algorithms C5 Mutual Exclusion">
+                Distributed Algorithms C5 Mutual Exclusion <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq"
+               alt="Jin HU" />
+          <p class="site-author-name" itemprop="name">Jin HU</p>
+          <p class="site-description motion-element" itemprop="description">If you don't have ability, you will wind up playing in a rock band.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jinhu94" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/jin-hu-349633138/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#The-election-problem"><span class="nav-number">1.</span> <span class="nav-text">The election problem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Election-for-arbitrary-topologies"><span class="nav-number">2.</span> <span class="nav-text">Election for arbitrary topologies</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Echo-election-algorithm"><span class="nav-number">2.1.</span> <span class="nav-text">Echo election algorithm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Election-Algorithms-for-unidirectional-Rings"><span class="nav-number">2.2.</span> <span class="nav-text">Election Algorithms for unidirectional Rings</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bully-algorithm"><span class="nav-number">2.2.1.</span> <span class="nav-text">Bully- algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#complexity"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">complexity</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#drawbacks-and-improvements"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">drawbacks and improvements</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#message-extinction-Chang-and-Roberts"><span class="nav-number">2.2.2.</span> <span class="nav-text">message extinction (Chang and Roberts)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#features"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">features</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Message-complexity"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">Message complexity</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Influence-of-message-overtaking"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">Influence of message overtaking</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Election-algorithms-for-Bidirectional-rings"><span class="nav-number">3.</span> <span class="nav-text">Election algorithms for Bidirectional rings</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hirschberg-Sinclair-Election-Algorithm"><span class="nav-number">3.1.</span> <span class="nav-text">Hirschberg-Sinclair-Election Algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#worst-case-message-complexity"><span class="nav-number">3.1.1.</span> <span class="nav-text">worst case message complexity</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#drawbacks-and-improvements-1"><span class="nav-number">3.1.2.</span> <span class="nav-text">drawbacks and improvements</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Peterson-Election-Algorithm"><span class="nav-number">3.2.</span> <span class="nav-text">Peterson Election Algorithm</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#worst-case-message-complexity-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">worst-case message complexity</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Best-case-message-complexity"><span class="nav-number">3.2.2.</span> <span class="nav-text">Best-case message complexity</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Average-case-message-complexity"><span class="nav-number">3.2.3.</span> <span class="nav-text">Average-case message complexity</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unidirectional-Peterson-Election"><span class="nav-number">3.3.</span> <span class="nav-text">Unidirectional Peterson Election???</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Election-Algorithms-on-Trees"><span class="nav-number">4.</span> <span class="nav-text">Election Algorithms on Trees</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Three-phases"><span class="nav-number">4.1.</span> <span class="nav-text">Three phases:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#message-complexity-with-k-initiators"><span class="nav-number">4.2.</span> <span class="nav-text">message complexity with k initiators</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Randomized-Election-Algorithms"><span class="nav-number">5.</span> <span class="nav-text">Randomized Election Algorithms</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Randomized-Election-in-Bidirectional-Rings"><span class="nav-number">5.1.</span> <span class="nav-text">Randomized Election in Bidirectional Rings</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin HU</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

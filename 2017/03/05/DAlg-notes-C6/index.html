@@ -1,0 +1,875 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="TUBcourse,Distributed Algorithm," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blackwhole" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="• Why do we need clocks in distributed systems?• What’s the problem anyway, ever computer in the system has a clock…• Synchronization of physical clocks, how do we realize this?• What are Logical Cloc">
+<meta name="keywords" content="TUBcourse,Distributed Algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Distributed Algorithm C6 Clocks">
+<meta property="og:url" content="http://yoursite.com/2017/03/05/DAlg-notes-C6/index.html">
+<meta property="og:site_name" content="Blackwhole">
+<meta property="og:description" content="• Why do we need clocks in distributed systems?• What’s the problem anyway, ever computer in the system has a clock…• Synchronization of physical clocks, how do we realize this?• What are Logical Cloc">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-03-08T08:40:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Distributed Algorithm C6 Clocks">
+<meta name="twitter:description" content="• Why do we need clocks in distributed systems?• What’s the problem anyway, ever computer in the system has a clock…• Synchronization of physical clocks, how do we realize this?• What are Logical Cloc">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/05/DAlg-notes-C6/"/>
+
+
+
+
+
+  <title> Distributed Algorithm C6 Clocks | Blackwhole </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blackwhole</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/05/DAlg-notes-C6/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Jin HU">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Blackwhole">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Blackwhole" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Distributed Algorithm C6 Clocks
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-05T09:34:20+01:00">
+                2017-03-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/notes/" itemprop="url" rel="index">
+                    <span itemprop="name">notes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>• Why do we need clocks in distributed systems?<br>• What’s the problem anyway, ever computer in the system has a clock…<br>• Synchronization of physical clocks, how do we realize this?<br>• What are Logical Clocks, and what kind of logical clocks do you know?</p>
+<p>Time in Distributed Systems</p>
+<p>Synchronization of physical clocks</p>
+<ul>
+<li>External clock synchronization after Cristian</li>
+</ul>
+<p>Order of events</p>
+<p>Logical clocks</p>
+<ul>
+<li>Lamport clocks</li>
+<li>vector clocks</li>
+<li>application of vector clocks: causal broadcast</li>
+</ul>
+<a id="more"></a>
+<h2 id="Time-in-Distributed-Systems"><a href="#Time-in-Distributed-Systems" class="headerlink" title="Time in Distributed Systems"></a>Time in Distributed Systems</h2><p>A clock maps the real time $t$ on a time stamp $C(t)$</p>
+<p>Resolution: smallest period of time by which two values of the clock can differ.</p>
+<p>Drift: Deviation of the speed of the clock from real time.</p>
+<p>offset: Deviation of the clock from the real time at a point in time. i.e., $t-C(t)$</p>
+<p>Each computer has its own inaccurate digital clock, the drifts are different from each other, without synchronization, the values of the clocks can differ arbitrarily from each other, thus we need <em>clock synchronization</em></p>
+<h2 id="Synchronization-of-physical-clocks"><a href="#Synchronization-of-physical-clocks" class="headerlink" title="Synchronization of physical clocks"></a>Synchronization of physical clocks</h2><h3 id="Synchronization-interval"><a href="#Synchronization-interval" class="headerlink" title="Synchronization interval"></a>Synchronization interval</h3><p>Two correct clocks with drift $\rho$ should not deviate by more than $d$. </p>
+<p>If the clocks are synchronized at $t=0$, then $C_1(t)=(1+\rho)t$  (faster) and $C_2(t)=t / (1+\rho)$ (slower) <strong>???为啥不是$1-\rho$ ???</strong></p>
+<p>$(1+\rho)t - \frac{t}{1+\rho} \le d$ , the clock must be synchronized again before $d\frac{1+\rho}{2\rho + \rho^2}$ </p>
+<p>If $\rho$ is very small, synchronization every $d/2\rho$ </p>
+<h3 id="External-clock-synchronization-Cristian"><a href="#External-clock-synchronization-Cristian" class="headerlink" title="External clock synchronization (Cristian)"></a>External clock synchronization (Cristian)</h3><p>For known message delays $x$, if process $P_2$ wants to adjust its clock based on process $P_1$, it just need to use $P_1$ ‘s time $t_1$ of sending message, plus the message delay $x$, then subtract $P_2$ ‘s time $t_2$ when receives the message, after that we know how  much time we need to adjust $P_2$’s clock.</p>
+<p>For unforeseeable message delay, the preceding procedure leas only to an approximate adjustment.</p>
+<p>Requirements:</p>
+<ul>
+<li><p>great leaps of the clock time shall be avoided</p>
+</li>
+<li><p>the clock time must not decrease</p>
+<p>The local clock runs slower or faster until the offset is compensated.</p>
+</li>
+</ul>
+<p>Berkeley Algorithm: Assume clocks are correct, calculate the average of all clocks as the measure to adjustment.</p>
+<h2 id="Order-of-Events"><a href="#Order-of-Events" class="headerlink" title="Order of Events"></a>Order of Events</h2><h3 id="definitions"><a href="#definitions" class="headerlink" title="definitions"></a>definitions</h3><p>Sending and receiving of a message are events. In distributed systems, the absolute point in time of events are often not important, we care about the order of events.</p>
+<p>Partial order: the order relation is not defined for all pairs of events.</p>
+<p>Total order: the order relation is defined for all pairs of events. i.e. $e_1 &lt; e_2 \rightarrow e_1 &lt; e_2 \vee e_2 &lt; e_1$</p>
+<h3 id="possible-order-requirements"><a href="#possible-order-requirements" class="headerlink" title="possible order requirements"></a>possible order requirements</h3><ol>
+<li><p>FIFO. If a process sends $m_1$ before $m_2$, then $m_1$ is delivered before $m_2$ to the receiver</p>
+</li>
+<li><p>casual order. A received message might cause the receiver to send another message, while another process may get these two messages in wrong order. </p>
+<p>=&gt; we can keep causalities based on “happened before” relation.</p>
+</li>
+</ol>
+<h3 id="“Happened-before”-Relation-Lamport"><a href="#“Happened-before”-Relation-Lamport" class="headerlink" title="“Happened before” Relation (Lamport)"></a>“Happened before” Relation (Lamport)</h3><p>Use the relation $\rightarrow$ to fulfill two following conditions:</p>
+<ul>
+<li>If $a$ and $b$ are two events in a process and $a$ occurs before $b$, then $a \rightarrow b$ （a是由b引起的）</li>
+<li>If $a$ is the sending of a message in a process and $b$ is the receipt of the same message in another process, then $a \to b$.</li>
+<li>If $a \to b$, an event $b \neq a$ <em>casually depends</em> on $a$.</li>
+<li>If neither $a \to b$ nor $b \to a$ , written $a \parallel b$  , two events $a \neq b$  are <em>causally independent</em>, also called <em>concurrent</em>. （如果a和b没有因果关系，可以理解为他们是并发的）</li>
+</ul>
+<p>logical clock解决的是给分布式系统中所有时间定一个顺序，使这个顺序可以正确排列出有因果关系的事件，使得分布式系统在逻辑上不会发生因果倒置的错误。</p>
+<p>We have several interpretations:</p>
+<ul>
+<li>$a \to b \Rightarrow$ $b$ casually depends on $a$</li>
+<li>$a \parallel b \Rightarrow$ $a$ and $b$ have not influenced each other causally</li>
+<li>$a \to b \Leftrightarrow$ as the time ascending, one can get from $a$ to $b$ in space-time diagram by following the process lines and message lines.</li>
+</ul>
+<p>Casual order: If the sending of message $m_2$ causally depends on sending the message $m_1$, then no receiver getting both messages delivers $m_2$ before $m_1$.</p>
+<p>Total delivery order: If two processes $P$ and $Q$ both deliver the messages $m_1$ and $m_2$ , then $P$ delivers $m_1$ before $m_2$ only if $Q$ also does that.</p>
+<p>Total FIFO order: both FIFO and total</p>
+<p>Total causal order: both causal and total</p>
+<h2 id="Logical-clocks"><a href="#Logical-clocks" class="headerlink" title="Logical clocks"></a>Logical clocks</h2><p>For each event $e$, assign a time stamp $C(e)$</p>
+<p>Each process $P_i$ manages a counter $C_i$, when a event $e$ occurs, $C_i$ increases 1, the event gets the new value as <em>logical time stamp</em>.</p>
+<p>$C(e)$ defines a partial order on the set of events, $e_1 &lt; e_2 \Leftrightarrow C(e_1)&lt;C(e_2)$ </p>
+<p>The time stamp $C^ {‘} (e_i)$ of an event $e_i$ is a pair $(C_i, P_i)$, $e_1 &lt; e_2 \Leftrightarrow C^{‘}(e_1) &lt; C^{‘}(e_2) \Leftrightarrow C_1&lt;C_2 \vee C_1 =C_2 \wedge P_1 &lt; P_2$ </p>
+<p>For two arbitrary events, $e1 \neq e_2 \Rightarrow e_1 &lt; e_2 \vee e_2 &lt; e_1$ </p>
+<p><em>But the simple logical time does not consider the causal correlation between events.</em></p>
+<h3 id="Clock-condition-Lamport"><a href="#Clock-condition-Lamport" class="headerlink" title="Clock condition (Lamport)"></a>Clock condition (Lamport)</h3><p>For all events $a, b$ , apply: $a \rightarrow b \Rightarrow C(a) &lt; C(b)$, so that the clock preserves the causal order of the events.</p>
+<p>Only applies $C(a) &lt; C(b) \Rightarrow a \rightarrow b \vee a \parallel b$</p>
+<p>also $C(a) = C(b) \Rightarrow a \parallel b$</p>
+<p>$a \rightarrow b$ 可以推出$C(a) &lt; C(b)$， 但反过来不一定</p>
+<p>Logical Clock解决的问题是找到一种方法，给分布式系统中所有时间定一个序，这个序能够正确地排列出具有因果关系的事件(不能保证并发事件的真实顺序)</p>
+<p>The logical time stamps define a partial order on the set of events that maintains the causal connection between events.</p>
+<p>Lamport’s Clocks Realization:</p>
+<p>Each $P_i$ has a logical clock $L_i$, whose value is adapted at the occurrence of the following events:</p>
+<ul>
+<li>local event with process $P_i$: $L_i$ ++, the event gets new value as time stamp.</li>
+<li>$P_i$ sends a message: $L_i$ ++, the send event gets new value as time stamp</li>
+<li>$P_i$ receives a message: $L_i = max(L_i, t_m)+1$ (前续事件的时间戳与接受到的消息的时间戳中较大者+1)</li>
+</ul>
+<p>Problem: We can not be sure whether two events causally depend on each other only by a time stamp. </p>
+<h3 id="Vector-clocks-Mattern-Fidge"><a href="#Vector-clocks-Mattern-Fidge" class="headerlink" title="Vector clocks(Mattern, Fidge)"></a>Vector clocks(Mattern, Fidge)</h3><p>Each process $P_i$ holds a vector time stamp $V_i$ consisting of n counters that are initially all zero.</p>
+<ul>
+<li>If an event occurs in a process $P_i$, the i-th component of its vector increases 1.</li>
+<li>If $P_i$ sends a message, the new version of $V_i$ is sent along.</li>
+<li>If $P_i$ receives a message with vector time stamp $T$, it forms the maximum of the new version of $V_i$ and $T$, <em>component-by-component</em>.(v1, v2两个向量，如果v1中的每个元素都不比其在v2中对应的元素小，那么v1&gt;v2；若两个向量中都有元素比对方向量的对应元素大，那么v1=v2；max(v1,v2)为两个向量的最大元素组成的向量)</li>
+</ul>
+<h3 id="Matrix-clocks"><a href="#Matrix-clocks" class="headerlink" title="Matrix clocks"></a>Matrix clocks</h3><p>Every process $P_i$ has a matrix time stamp $M_i$ given by a $n \times n$ -matrix initialized by zero matrix.</p>
+<p>If a local event occurs, process $P_i$ increases the components $M_i[i,i]$ (the i-th element at diagonal) by 1.</p>
+<p>Interpretation of the elements of matrix $M_i$:</p>
+<ul>
+<li>$M_i[i,i]$ is the local clock $P_i$</li>
+<li>$M_i[i,l]$ is the knowledge of $P_i$ on the local clock of $P_l$</li>
+<li>$M_i[k,l]$ is the knowledge of $P_i$ on the knowledge of $P_k$ on the local clock of $P_l$ </li>
+</ul>
+<p>If $P_j$ gets a message from $P_i$,</p>
+<ul>
+<li>update the time vector of $P_j$ with the time vector of $P_i$: what $P_j$ knows about the local clock of $P_k$</li>
+<li>update the knowledge of $P_j$ on the time vector of other processes $P_k$: what $P_j$ knows about what $P_k$ knows on the local clock $P_i$.</li>
+</ul>
+<h2 id="Application-of-vector-and-matrix-clocks"><a href="#Application-of-vector-and-matrix-clocks" class="headerlink" title="Application of vector and matrix clocks"></a>Application of vector and matrix clocks</h2><h3 id="application-of-vector-clocks-Causal-broadcast"><a href="#application-of-vector-clocks-Causal-broadcast" class="headerlink" title="application of vector clocks: Causal broadcast"></a>application of vector clocks: Causal broadcast</h3><p>each message shall be sent to all processes, and should satisfy causality.</p>
+<p>$P_i$ only increments $V_i[i]$ if it sends a message</p>
+<p>Delivery condition: A message sent by $P_i$ is only delivered to $P_j$ when the time stamp $T$ fulfills the condition: $T[i] = V_j[i]+1 \wedge \forall k \neq i: T[k] \le V_j[k]$ </p>
+<p>It is sufficient to increase $V_j[i]$ by 1 at delivery, don’t need to calculate the maximum.</p>
+<p>一个进程会给其他进程发消息，对同一个进程如果发送了两个消息i和j，那么其他所有进程应该先接到j再接到i，如果某个进程在收到j之前收到了i，会直到收到j再接收i。</p>
+<h3 id="application-of-lamport-clocks-Causal-multicast-and-causal-unicast"><a href="#application-of-lamport-clocks-Causal-multicast-and-causal-unicast" class="headerlink" title="application of lamport clocks: Causal multicast and causal unicast"></a>application of lamport clocks: Causal multicast and causal unicast</h3><p>Lamport clock alone are not sufficient for implementing a causal multicast.</p>
+<p>We can make processes send messages periodically or request messages on demand to ensure FIFO channels.</p>
+<p>But this solution delays delivery.</p>
+<p>It can also be used for causal unicast, but the delivery of messages can be unnecessarily delayed.</p>
+<p>=&gt; matrix clocks for causal unicast.</p>
+<h3 id="Application-of-matrix-clocks-Causal-unicast"><a href="#Application-of-matrix-clocks-Causal-unicast" class="headerlink" title="Application of matrix clocks: Causal unicast"></a>Application of matrix clocks: Causal unicast</h3><p>Every process $P_i$ has a matrix time stamp $M_i$ given by a $n \times n$ -matrix initialized by zero matrix.</p>
+<p>If $P_i$ sends a message to $P_j$, $M_i[i,j]$ is incremented, and the new version of matrix $M_i$ is sent together with the message.</p>
+<p>If $P_j$ gets a message, it calculates the component-wise maximum of its own matrix $M_j$ and the matrix $M$ contained in the message. $1 \le i, k\le n: M_j[i,k] = max(M_j[i,k], M[i,k])$ </p>
+<p>在进程$P_i$给$P<em>j$发送信息时，$P</em>{ii}$ 加1，无论是$P_j$ 知道的$P_i$ 已发给$P_j$ 的消息数，还是其他进程认为的$P_j$已知的$P_i$发给$P<em>j$ 的消息数都不能大于$P</em>{ii}$</p>
+<p>Delivered condition:</p>
+<ul>
+<li>$M[i,j]=M_j[i,j]+1$ to make sure the message is the next message that $P_j$ expects from $P_i$</li>
+<li>$ \forall k \neq i, 1 \le k \le n: M[k,j] \le M_j[k,j]$ </li>
+</ul>
+<p>The maximum of $M$ and $M_j$ is calculated after delivery of the message</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TUBcourse/" rel="tag"># TUBcourse</a>
+          
+            <a href="/tags/Distributed-Algorithm/" rel="tag"># Distributed Algorithm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/04/DAlg-notes-C5/" rel="next" title="Distributed Algorithms C5 Mutual Exclusion">
+                <i class="fa fa-chevron-left"></i> Distributed Algorithms C5 Mutual Exclusion
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/07/DAlg-notes-C7/" rel="prev" title="Distributed Algorithms C7 -- Consistent snapshot">
+                Distributed Algorithms C7 -- Consistent snapshot <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq"
+               alt="Jin HU" />
+          <p class="site-author-name" itemprop="name">Jin HU</p>
+          <p class="site-description motion-element" itemprop="description">If you don't have ability, you will wind up playing in a rock band.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jinhu94" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/jin-hu-349633138/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Time-in-Distributed-Systems"><span class="nav-number">1.</span> <span class="nav-text">Time in Distributed Systems</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Synchronization-of-physical-clocks"><span class="nav-number">2.</span> <span class="nav-text">Synchronization of physical clocks</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Synchronization-interval"><span class="nav-number">2.1.</span> <span class="nav-text">Synchronization interval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#External-clock-synchronization-Cristian"><span class="nav-number">2.2.</span> <span class="nav-text">External clock synchronization (Cristian)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Order-of-Events"><span class="nav-number">3.</span> <span class="nav-text">Order of Events</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#definitions"><span class="nav-number">3.1.</span> <span class="nav-text">definitions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#possible-order-requirements"><span class="nav-number">3.2.</span> <span class="nav-text">possible order requirements</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#“Happened-before”-Relation-Lamport"><span class="nav-number">3.3.</span> <span class="nav-text">“Happened before” Relation (Lamport)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logical-clocks"><span class="nav-number">4.</span> <span class="nav-text">Logical clocks</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Clock-condition-Lamport"><span class="nav-number">4.1.</span> <span class="nav-text">Clock condition (Lamport)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vector-clocks-Mattern-Fidge"><span class="nav-number">4.2.</span> <span class="nav-text">Vector clocks(Mattern, Fidge)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Matrix-clocks"><span class="nav-number">4.3.</span> <span class="nav-text">Matrix clocks</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Application-of-vector-and-matrix-clocks"><span class="nav-number">5.</span> <span class="nav-text">Application of vector and matrix clocks</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#application-of-vector-clocks-Causal-broadcast"><span class="nav-number">5.1.</span> <span class="nav-text">application of vector clocks: Causal broadcast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#application-of-lamport-clocks-Causal-multicast-and-causal-unicast"><span class="nav-number">5.2.</span> <span class="nav-text">application of lamport clocks: Causal multicast and causal unicast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Application-of-matrix-clocks-Causal-unicast"><span class="nav-number">5.3.</span> <span class="nav-text">Application of matrix clocks: Causal unicast</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin HU</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

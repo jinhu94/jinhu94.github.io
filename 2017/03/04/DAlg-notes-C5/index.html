@@ -1,0 +1,899 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="TUBcourse,Distributed Algorithm," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blackwhole" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="• We discussed several types of algorithms for mutual exclusion, can you tell me which?• What are the two main requirements for mutual exclusion algorithms?• There is often another requirement needed,">
+<meta name="keywords" content="TUBcourse,Distributed Algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Distributed Algorithms C5 Mutual Exclusion">
+<meta property="og:url" content="http://yoursite.com/2017/03/04/DAlg-notes-C5/index.html">
+<meta property="og:site_name" content="Blackwhole">
+<meta property="og:description" content="• We discussed several types of algorithms for mutual exclusion, can you tell me which?• What are the two main requirements for mutual exclusion algorithms?• There is often another requirement needed,">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-03-08T08:39:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Distributed Algorithms C5 Mutual Exclusion">
+<meta name="twitter:description" content="• We discussed several types of algorithms for mutual exclusion, can you tell me which?• What are the two main requirements for mutual exclusion algorithms?• There is often another requirement needed,">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/04/DAlg-notes-C5/"/>
+
+
+
+
+
+  <title> Distributed Algorithms C5 Mutual Exclusion | Blackwhole </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blackwhole</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/04/DAlg-notes-C5/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Jin HU">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Blackwhole">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Blackwhole" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Distributed Algorithms C5 Mutual Exclusion
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-04T09:34:15+01:00">
+                2017-03-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/notes/" itemprop="url" rel="index">
+                    <span itemprop="name">notes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>• We discussed several types of algorithms for mutual exclusion, can you tell me which?<br>• What are the two main requirements for mutual exclusion algorithms?<br>• There is often another requirement needed, which is…?<br>• Explain the … algorithm.</p>
+<p>problem of mutual exclusion</p>
+<p>Algorithm with central coordinator</p>
+<p>Broadcast-based algorithms</p>
+<p>Quorum-based algorithms</p>
+<p>Token-based algorithms</p>
+<p>Comparison of algorithms</p>
+<a id="more"></a>
+<h2 id="Mutual-exclusion"><a href="#Mutual-exclusion" class="headerlink" title="Mutual exclusion"></a>Mutual exclusion</h2><p>Coordination of the exclusive access on resources, often, there’s only 1 process shall access the resource</p>
+<p>If a process has the right to access, he releases it after finite time voluntarily.</p>
+<h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><ul>
+<li><p>safety: something bad that cannot be undone shall never happen, 不该发生的绝不发生</p>
+</li>
+<li><p>liveness: something that should happen eventually happens，该发生的确保发生</p>
+</li>
+<li><p>fairness: No starvation, if a process wants access, the access has to be allowed after finite time.</p>
+<p>strong fairness: The allowance of access takes the order of access requests into account</p>
+</li>
+<li><p>often a trivial solution is possible for only one of the safety and liveness.</p>
+</li>
+</ul>
+<h2 id="Algorithm-with-Central-Coordinator"><a href="#Algorithm-with-Central-Coordinator" class="headerlink" title="Algorithm with Central Coordinator"></a>Algorithm with Central Coordinator</h2><p>A process is assigned as <em>coordinator</em>.</p>
+<p>Coordinator grants accesses, 3 messages per access with blocking operations.</p>
+<p>e.g: suppose processes 1, 2, 3 and a coordinator k. If process 1 wants to access, it should ask k if the resource is free, if k answers free, it gets access and send a message to tell k it has done the job.</p>
+<p>Disadvantages:</p>
+<ul>
+<li>Single point of failure</li>
+<li>Asymmetrical load distribution</li>
+</ul>
+<h2 id="Broadcast-Based-Algorithms-Lamport"><a href="#Broadcast-Based-Algorithms-Lamport" class="headerlink" title="Broadcast-Based Algorithms (Lamport)"></a>Broadcast-Based Algorithms (Lamport)</h2><p>Assume that all messages have an unique <em>logical time stamps</em>, lossless FIFO-communication channels.</p>
+<h3 id="Basic-idea"><a href="#Basic-idea" class="headerlink" title="Basic idea:"></a>Basic idea:</h3><ul>
+<li>Each process manages a message queue ordered according to time stamps.</li>
+<li>Requests and releases are sent to all processes via broadcast.</li>
+</ul>
+<p>a process must only access if:</p>
+<ul>
+<li>its own request is the first request in its own queue</li>
+<li>It already received a message (request 和 confirmation都可以) from each other process with a larger time stamp</li>
+</ul>
+<h3 id="Broadcast-Algorithm"><a href="#Broadcast-Algorithm" class="headerlink" title="Broadcast Algorithm:"></a>Broadcast Algorithm:</h3><p>每个进程维护一个队列，请求开始时，先将请求插入自身队列，发送request给其他进程，其他进程将请求插入自己的队列，再回确认消息，执行任务后发送释放资源的消息给其他进程，再将这个请求移出队列。</p>
+<ol>
+<li>Issue access request: insert request into own queue, send it to all other processes</li>
+<li>Receive access request: insert request into its own queue according to the order of time stamp, send request confirmation to requesting process.</li>
+<li>Send release after access: remove own request from own queue, send release to all other processes.</li>
+<li>Received release: remove request from own queue.</li>
+</ol>
+<p>message complexity: sending $n-1$ requests, $n-1$ processes send their confirmation, sending of release to $n-1$ processes. Thus, $3(n-1)$ messages per access altogether.</p>
+<h3 id="Improvement-by-Ricart-and-Agrawala"><a href="#Improvement-by-Ricart-and-Agrawala" class="headerlink" title="Improvement (by Ricart and Agrawala):"></a>Improvement (by Ricart and Agrawala):</h3><p>Idea: avoid explicit release messages through delayed confirmation. (不要release的消息，用delayed confirmation代替，以至每个access只需要$2(n-1)$条消息)</p>
+<p>Issue access request: For a new request, give a sequence number to this request, this number is by 1 larger than all previously received requests, then send request to all other $n-1$ processes, after receive $n-1$ confirmations, access.</p>
+<p>When a request arrives: if not applied or the sender has “older rights”, send confirmation immediately, other wise, confirmation is sent only after the ending of the own access.</p>
+<p>一个进程想访问资源，它发送一个消息包含request，进程号和序列号（从1开始，大于该进程之前收到的请求）给其它进程告诉大家它要访问资源。对于接收者，如果它已获得对资源的访问，它就不进行应答，直到完成它的访问再发送delayed confirmation给发送者；如果是接收者想访问资源但还没开始，它会比较自身请求的序列号和它收到的请求的序列号，序列号小的胜出（序列号也可以是时间戳）；如果接收者没有访问资源也不打算访问，就发一个immediate confirmation给发送者。</p>
+<h3 id="Requirements-1"><a href="#Requirements-1" class="headerlink" title="Requirements:"></a>Requirements:</h3><p>a solution that requires less message per access and still distributes the load equally between all processes.</p>
+<p>a solution which does not include the involvement of all process in each coordination and still distributes the load equally between all processes.</p>
+<h2 id="Quorum-Based-Algorithms"><a href="#Quorum-Based-Algorithms" class="headerlink" title="Quorum Based Algorithms"></a>Quorum Based Algorithms</h2><h3 id="Process-mesh-algorithm-Maekawa"><a href="#Process-mesh-algorithm-Maekawa" class="headerlink" title="Process mesh-algorithm (Maekawa)"></a>Process mesh-algorithm (Maekawa)</h3><p>基于子集请求而不是全集请求的互斥算法</p>
+<p>$n$ processes are arranged in a quadratic mesh with an edge length of $\sqrt{n}$</p>
+<p>A process $P_i$ must ask its granting set $R_i$ for allowance before access. For all pairs of process $P_i$ and $P_j$, their $R_i$ and $R_j$ have at least two processes in common. Granting sets have the cardinal number $2\sqrt{n}-2$, namely $R_i - P_i$ </p>
+<p>Message complexity:</p>
+<ul>
+<li><p>send request to $2\sqrt{n}-2$ processes</p>
+</li>
+<li><p>$2\sqrt{n}-2$ processes send confirmation</p>
+</li>
+<li><p>send release to  $2\sqrt{n}-2$ processes</p>
+<p>==&gt; $3[2\sqrt{n}-2]$ messages per access altogether.</p>
+</li>
+</ul>
+<p>Problem: deadlocks may occur. </p>
+<ol>
+<li>introduce two additional message types to avoid deadlocks.</li>
+<li>increase the number of messages per access on $5[2\sqrt{n}-2]$ in the worst-case.</li>
+</ol>
+<p>Another arrangement involving smaller cardinal number of the granting set?</p>
+<p>=&gt; triangular arrangement</p>
+<p>Use triangular arrangement, a single common process would be enough, with granting set size about $\sqrt{2}\sqrt{n}$ .</p>
+<p>Problem: some processes may need more confirmation.</p>
+<p><strong>???solution for load balancing???</strong></p>
+<p>used for 2 different schemes</p>
+<p>The first is nodes on same column and the one on the top left, the second is nodes on same row and the one down on the right side.</p>
+<p>For the same scheme, granting set intersects with each other.</p>
+<p>Also, granting set can intersect with granting set of other schemes.</p>
+<p>All processes occur altogether in both schemes equally often in a granting set.</p>
+<p>=&gt; <em>Thus, use both schemes randomly can attain load balancing.</em></p>
+<h3 id="Minimal-Arrangement"><a href="#Minimal-Arrangement" class="headerlink" title="Minimal Arrangement"></a>Minimal Arrangement</h3><p>Suppose $K$ is the size of the granting set, then a minimal arrangement exists if $K-1=p^m$, $p$ is a prime number, $n$ is a natural number, then the arrangement has $n=K(K-1)+1$ processes.</p>
+<h2 id="Token-Based-Algorithms"><a href="#Token-Based-Algorithms" class="headerlink" title="Token Based Algorithms"></a>Token Based Algorithms</h2><h3 id="Simple-token-Ring-solution-Le-Lann"><a href="#Simple-token-Ring-solution-Le-Lann" class="headerlink" title="Simple token Ring-solution (Le Lann)"></a>Simple token Ring-solution (Le Lann)</h3><ul>
+<li>Processes are arranged in a logical ring</li>
+<li>Access is controlled by circulation token</li>
+<li>Applicants waits for access until token reaches it</li>
+<li>Accessing process relays the token with the release</li>
+<li>Process without access intention relays the token directly</li>
+<li>possible to use separate tokens for coordinating access to individual resources</li>
+</ul>
+<p>进程0得到token后沿着环进行传递，进程获得令牌时，如果有访问需求，就对资源进行访问，完成后继续向后传递token，如果没有则直接传token给后继。</p>
+<p>advantages: simple, correct, fair, no deadlocks, no starvation.</p>
+<p>Disadvantages: token is always on the way, sometimes it’s useless. The message number per request is not limited. Need to wait for a long time if there’re large number of processes.</p>
+<h3 id="Token-based-solution-Suzuki-and-Kasami"><a href="#Token-based-solution-Suzuki-and-Kasami" class="headerlink" title="Token-based solution (Suzuki and Kasami)???"></a>Token-based solution (Suzuki and Kasami)???</h3><p>A requesting process sends a request with its sequence number to all other processes (ring circuit or via broadcast)</p>
+<p>Each process $P_i$ stores the highest currently received sequence number in a list $R_i$.</p>
+<h3 id="Lift-Algorithm-Raymond"><a href="#Lift-Algorithm-Raymond" class="headerlink" title="Lift Algorithm (Raymond)"></a>Lift Algorithm (Raymond)</h3><p>Use a spanning tree for selective relay (转发) of the request in direction to the token.</p>
+<p>The edges have two directions.</p>
+<p>The token wanders against the arrow direction, every time the token passed an edge, it changes the direction of this edge.</p>
+<p>A process that wants the token sends request over its outgoing edge.</p>
+<p>request顺着箭头方向发，token逆着箭头方向发，token经过一条边这条边的方向会被改变。</p>
+<p>每个process记录给它发送request的process</p>
+<p>If a process receives the token, it can send it in one of the requesting directions, or if there are more requests from other directions, it sends a request after the token.</p>
+<p>$O(log_kn)$ messages per access are needed, $k$ is the k-ray.</p>
+<blockquote>
+<p>a k-ary tree is a rooted tree in which each node has no more than k children</p>
+</blockquote>
+<p>Start state: winner of an election gets the token and creates a spanning tree with edges directed towards itself.</p>
+<h2 id="Comparison-of-message-complexity-per-access"><a href="#Comparison-of-message-complexity-per-access" class="headerlink" title="Comparison of message complexity per access"></a>Comparison of message complexity per access</h2><table>
+<thead>
+<tr>
+<th>procedure</th>
+<th>message complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Token Ring</td>
+<td></td>
+</tr>
+<tr>
+<td>Simple broadcast</td>
+<td></td>
+</tr>
+<tr>
+<td>Improved broadcast</td>
+<td></td>
+</tr>
+<tr>
+<td>improved token ring</td>
+<td></td>
+</tr>
+<tr>
+<td>mesh arrangement</td>
+<td></td>
+</tr>
+<tr>
+<td>lift algorithm on k-ary tree</td>
+<td></td>
+</tr>
+<tr>
+<td>central manager</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TUBcourse/" rel="tag"># TUBcourse</a>
+          
+            <a href="/tags/Distributed-Algorithm/" rel="tag"># Distributed Algorithm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/03/DAlg-notes-C4/" rel="next" title="Distributed Algorithm C4 -- Election Algorithms">
+                <i class="fa fa-chevron-left"></i> Distributed Algorithm C4 -- Election Algorithms
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/05/DAlg-notes-C6/" rel="prev" title="Distributed Algorithm C6 Clocks">
+                Distributed Algorithm C6 Clocks <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq"
+               alt="Jin HU" />
+          <p class="site-author-name" itemprop="name">Jin HU</p>
+          <p class="site-description motion-element" itemprop="description">If you don't have ability, you will wind up playing in a rock band.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jinhu94" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/jin-hu-349633138/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Mutual-exclusion"><span class="nav-number">1.</span> <span class="nav-text">Mutual exclusion</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Requirements"><span class="nav-number">1.1.</span> <span class="nav-text">Requirements</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Algorithm-with-Central-Coordinator"><span class="nav-number">2.</span> <span class="nav-text">Algorithm with Central Coordinator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Broadcast-Based-Algorithms-Lamport"><span class="nav-number">3.</span> <span class="nav-text">Broadcast-Based Algorithms (Lamport)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Basic-idea"><span class="nav-number">3.1.</span> <span class="nav-text">Basic idea:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Broadcast-Algorithm"><span class="nav-number">3.2.</span> <span class="nav-text">Broadcast Algorithm:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Improvement-by-Ricart-and-Agrawala"><span class="nav-number">3.3.</span> <span class="nav-text">Improvement (by Ricart and Agrawala):</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Requirements-1"><span class="nav-number">3.4.</span> <span class="nav-text">Requirements:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Quorum-Based-Algorithms"><span class="nav-number">4.</span> <span class="nav-text">Quorum Based Algorithms</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Process-mesh-algorithm-Maekawa"><span class="nav-number">4.1.</span> <span class="nav-text">Process mesh-algorithm (Maekawa)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Minimal-Arrangement"><span class="nav-number">4.2.</span> <span class="nav-text">Minimal Arrangement</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Token-Based-Algorithms"><span class="nav-number">5.</span> <span class="nav-text">Token Based Algorithms</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Simple-token-Ring-solution-Le-Lann"><span class="nav-number">5.1.</span> <span class="nav-text">Simple token Ring-solution (Le Lann)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Token-based-solution-Suzuki-and-Kasami"><span class="nav-number">5.2.</span> <span class="nav-text">Token-based solution (Suzuki and Kasami)???</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lift-Algorithm-Raymond"><span class="nav-number">5.3.</span> <span class="nav-text">Lift Algorithm (Raymond)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Comparison-of-message-complexity-per-access"><span class="nav-number">6.</span> <span class="nav-text">Comparison of message complexity per access</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin HU</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

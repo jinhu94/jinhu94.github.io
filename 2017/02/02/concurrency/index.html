@@ -1,0 +1,1030 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="TUBcourse,DatabaseTechnology," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blackwhole" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="This chapter talks about how to use concurrency control to implement isolation and consistency of database, include concurrency execution, serializability theory, 2 phase locking, hierarchical locking">
+<meta name="keywords" content="TUBcourse,DatabaseTechnology">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DBT 07 Concurrency Control">
+<meta property="og:url" content="http://yoursite.com/2017/02/02/concurrency/index.html">
+<meta property="og:site_name" content="Blackwhole">
+<meta property="og:description" content="This chapter talks about how to use concurrency control to implement isolation and consistency of database, include concurrency execution, serializability theory, 2 phase locking, hierarchical locking">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2017-02-04T12:53:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DBT 07 Concurrency Control">
+<meta name="twitter:description" content="This chapter talks about how to use concurrency control to implement isolation and consistency of database, include concurrency execution, serializability theory, 2 phase locking, hierarchical locking">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/02/concurrency/"/>
+
+
+
+
+
+  <title> DBT 07 Concurrency Control | Blackwhole </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blackwhole</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            Sitemap
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/02/concurrency/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Jin HU">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Blackwhole">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Blackwhole" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                DBT 07 Concurrency Control
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-02T07:49:04+01:00">
+                2017-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/notes/" itemprop="url" rel="index">
+                    <span itemprop="name">notes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>This chapter talks about how to use concurrency control to implement isolation and consistency of database, include concurrency execution, serializability theory, 2 phase locking, hierarchical locking, how to deal with deadlocks.</p>
+<a id="more"></a>
+<h2 id="several-definitions"><a href="#several-definitions" class="headerlink" title="several definitions:"></a>several definitions:</h2><ol>
+<li><p>transaction: a unit of work, has multiple data accesses and updates</p>
+<p> transaction introduces two problems:</p>
+<ul>
+<li><p>what to do when system has failure? == Recovery</p>
+</li>
+<li><p>what happens when two transactions try to access the same object? == <strong>Concurrency</strong></p>
+</li>
+</ul>
+</li>
+</ol>
+<ol>
+<li><p>ACID properties</p>
+<ul>
+<li><p>Atomicity: operations only have two states, namely complete or none of them complete</p>
+</li>
+<li><p>Consistency: transactions applied to a consistent database and produce consistent database(preserve integrity constraints)</p>
+</li>
+<li><p>Isolation: A transacion executes as it is the only transaction running in the system</p>
+</li>
+<li><p>Durability: The effects of committed transactions are reflected in the database even after failures</p>
+</li>
+</ul>
+</li>
+<li><p>Transaction Model<br>Assuem we have database items X, Y, Z, …</p>
+<ul>
+<li><p>Ri(X) – Transaction Ti reads item X</p>
+</li>
+<li><p>Wi(X) – Transaction Wi writes item X</p>
+</li>
+<li><p>Ai – Transaction Ti aborts</p>
+</li>
+<li><p>Ci – Transaction Ti commits</p>
+</li>
+</ul>
+</li>
+</ol>
+<p><em>Concurrency: implement isolation and consistency</em></p>
+<h2 id="Concurrency-Execution-–-interleaved-operations"><a href="#Concurrency-Execution-–-interleaved-operations" class="headerlink" title="Concurrency Execution – interleaved operations"></a>Concurrency Execution – interleaved operations</h2><p>Why use concurrency?</p>
+<ul>
+<li><p>use resources efficiently</p>
+</li>
+<li><p>keep fairness of database</p>
+</li>
+<li><p>short transactions don’t need to wait long transactions finished</p>
+</li>
+</ul>
+<h3 id="Serializability-theory"><a href="#Serializability-theory" class="headerlink" title="Serializability theory"></a>Serializability theory</h3><p>interleaved operations may cause inconsistency. So we need a <strong>schedual</strong> which is <em>a partial order of transaction operations that indicates how they interleaved</em>, namely an order of how operations of a transactioni executed.<br>For a correct schedual:</p>
+<ul>
+<li><p>all operations appear in the same order as they appear in transaction</p>
+</li>
+<li><p>a complete order of all conflicting operations of all Ti, Tj is sepcified. </p>
+<p>a <strong>Serial schedual</strong> is a schedual <em>where all oeprations of each transactions appear in consecutive blocks</em></p>
+<p>(the order of transactions can be swapped, but the order of operations in a transaction cannot be swapped)</p>
+</li>
+</ul>
+<h4 id="conflict-conflict-equivalent-conflict-serializable"><a href="#conflict-conflict-equivalent-conflict-serializable" class="headerlink" title="conflict, conflict-equivalent, conflict-serializable"></a>conflict, conflict-equivalent, conflict-serializable</h4><p> for two transactions Ti, Tj:</p>
+<table>
+<thead>
+<tr>
+<th>not conflict</th>
+<th>may conflict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ri(X); rj(Y)</td>
+<td>ri(X); wi(Y)</td>
+</tr>
+<tr>
+<td>ri(X); Wj(Y) (X!=Y)</td>
+<td>wi(X); wj(X)</td>
+</tr>
+<tr>
+<td>wi(X);rj(Y) (X!=Y)</td>
+<td>ri(X); wj(X)</td>
+</tr>
+<tr>
+<td>wi(X);wj(Y) (X!=Y)</td>
+<td>wi(X); rj(X)</td>
+</tr>
+</tbody>
+</table>
+<p>operations cannot be swapped when: <strong> two transactions involve same database element and at least one operation is write</strong></p>
+<p>two schedual S and S’, if:</p>
+<ul>
+<li><p>they have same transactions and operations</p>
+</li>
+<li><p>one can be transformed to another via swap non-conflicting operators</p>
+</li>
+</ul>
+<p>Then they are <strong>conflict-equivalent</strong></p>
+<p>if and only if a schedule is conflict-equivalent to some serial schedual, it is <strong>conflict-serializable</strong></p>
+<h4 id="precedence-Graph"><a href="#precedence-Graph" class="headerlink" title="precedence Graph"></a>precedence Graph</h4><p>can check if a schedual S is conflict-serializable</p>
+<p>for a schedual S has transactions T1, T2, action A1 in T1, action A2 in T2, if:</p>
+<ul>
+<li><p>A1 ahead of A2</p>
+</li>
+<li><p>A1 and A2 has the same database element</p>
+</li>
+<li><p>at least one of A1 A2 is write</p>
+</li>
+</ul>
+<p>Then, T1 <em>takes precedence of</em> T2, A1–&gt;A2<br>check the order of actions which have same database element to decide ?–&gt;?, and that’s a directed line in precedence graph.</p>
+<p>If no cycles in precedence graph, then S is conflict-serializable.</p>
+<h2 id="Locking"><a href="#Locking" class="headerlink" title="Locking"></a>Locking</h2><p>locking is used to prevent unserializable behavior</p>
+<ul>
+<li><p>li(X): Ti request a lock on X</p>
+</li>
+<li><p>Ui(X): Ti unlocks its lock on X</p>
+</li>
+</ul>
+<p>Properties:</p>
+<ol>
+<li><p><em>Legality</em>: two transactions cannot lock the same element </p>
+</li>
+<li><p><em>Consistency</em>: Before write or read X, the transaction T needs to lock X, if there is li(X), then there must be a ui(X) after.</p>
+</li>
+</ol>
+<h3 id="2-phase-locking"><a href="#2-phase-locking" class="headerlink" title="2-phase locking"></a>2-phase locking</h3><p>to guarantee that a legal schedual of consistent transactions is conflict-serializable</p>
+<p><strong>1st phase: locks obtained only</strong></p>
+<p><strong>2nd phase: locks relinquished only</strong></p>
+<p>But 2-phase locking cannot prevent deadlocks, when they are waiting each other’s unlocking.</p>
+<h3 id="several-lock-models"><a href="#several-lock-models" class="headerlink" title="several lock models"></a>several lock models</h3><ul>
+<li><p>shared lock (can have many in one transaction) – <strong>used to protect read</strong></p>
+</li>
+<li><p>exclusive lock (only one in one transaction) – <strong>used to protect both read and write access</strong></p>
+</li>
+</ul>
+<p>ri(X) must be preceded by sli(X) or xli(X), wi(X) must be preceded by xli(X)</p>
+<p>requirements:</p>
+<ol>
+<li><p>Consistency: ri(X) after sli(X) or xli(X), and no ui(X) between them; wi(X) after xli(X), no ui(X) neither.</p>
+</li>
+<li><p>Two-phase locking: locking must precede unlocking.</p>
+</li>
+<li><p>Legality: Before unlock, we cannot give same type of lock to same database element from different transactions (such as Ti, Tj).</p>
+</li>
+</ol>
+<p>If you got xli(X), no xlj(X) or slj(X)</p>
+<p>If you got sli(X), no xlj(X).</p>
+<p>The same database element from the same transaction can be locked by share lock and exclusive lock, but it must under the situation that no other transacitons have conflicts.</p>
+<p>Compatability matrix – describe lock management policies</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>S</td>
+<td>X</td>
+</tr>
+<tr>
+<td>S</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>X</td>
+<td>no</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Hierarchical-Locking"><a href="#Hierarchical-Locking" class="headerlink" title="Hierarchical Locking"></a>Hierarchical Locking</h3><p>more fine grained locking ==&gt; better concurrency</p>
+<p>Granularities(top - down) :</p>
+<p>Database – Table – Table partition – Index – Page – Tuple – Index page</p>
+<p>IS: intention to obtain S lock at finer granularity</p>
+<p>IX: intention to obtain X lock at finer granularity</p>
+<p>SIX: S lock on this granularity, intention to obtain X at a finer granularity</p>
+<p>but:</p>
+<pre><code>- lock size increase
+
+- big locks force other transactions to wait
+</code></pre><p>use intention locks to implement hierarchical locking protocol:</p>
+<ol>
+<li><p>start at root</p>
+</li>
+<li><p>have IS or IX on all ancestors to get IS or S</p>
+</li>
+<li><p>To get IX, SIX or X, must have IX or SIX on all ancestors</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>IS</td>
+<td>IX</td>
+<td>SIX</td>
+<td>S</td>
+<td>X</td>
+</tr>
+<tr>
+<td>IS</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+<tr>
+<td>IX</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>SIX</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>S</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+<tr>
+<td>X</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+<td>N</td>
+</tr>
+</tbody>
+</table>
+<p>The lock manager:</p>
+<ul>
+<li><p>acquireLock(T, X, mode)</p>
+</li>
+<li><p>releaseLock(T, X, mode)</p>
+</li>
+</ul>
+<h2 id="Deal-with-deadlocks"><a href="#Deal-with-deadlocks" class="headerlink" title="Deal with deadlocks"></a>Deal with deadlocks</h2><p>deadlock: 2 transactions are waiting for each other’s locks to be released</p>
+<p>2 ways: delete or avoid deadlocks</p>
+<ul>
+<li>Deadlock avoidance: impose order in which locks can be acquired, transactions notify they need locks in advance, if deadlock happened, abort T rather than blocking it.</li>
+</ul>
+<p>However: transactions usually don’t know if they need locks in advance.</p>
+<ul>
+<li>Deadlock prevention: ABort transactions waiting too long – timeouts</li>
+</ul>
+<p>However: how to pitch timeout parameter?</p>
+<ul>
+<li>Deadlock detection: Ti-&gt;Tj means Ti is blocked waiting for Tj to release a lock. If cycle, then deadlocks happen, roll back releases locks automatically</li>
+</ul>
+<p>Dreadlock algorithm???</p>
+<h2 id="Isolation-levels"><a href="#Isolation-levels" class="headerlink" title="Isolation levels"></a>Isolation levels</h2><p>blocking impair the response time of transactions.</p>
+<p>Some applications can tolerate a bit of “dirtyness”, they don’t always need full serializability.</p>
+<p>=&gt; solution: defining levels of isolation to trade isolation and concurrency.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/TUBcourse/" rel="tag"># TUBcourse</a>
+          
+            <a href="/tags/DatabaseTechnology/" rel="tag"># DatabaseTechnology</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/30/Recovery/" rel="next" title="DBT 08 Recovery from system failures">
+                <i class="fa fa-chevron-left"></i> DBT 08 Recovery from system failures
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/04/coprocessing/" rel="prev" title="coprocessing and GPU">
+                coprocessing and GPU <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTP_kGUi2GkujJOg5lq0k1sVJ98ewg1RoZjAWV7qMjfsoKIJFmq"
+               alt="Jin HU" />
+          <p class="site-author-name" itemprop="name">Jin HU</p>
+          <p class="site-description motion-element" itemprop="description">If you don't have ability, you will wind up playing in a rock band.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jinhu94" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.linkedin.com/in/jin-hu-349633138/" target="_blank" title="LinkedIn">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkedIn
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#several-definitions"><span class="nav-number">1.</span> <span class="nav-text">several definitions:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Concurrency-Execution-–-interleaved-operations"><span class="nav-number">2.</span> <span class="nav-text">Concurrency Execution – interleaved operations</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Serializability-theory"><span class="nav-number">2.1.</span> <span class="nav-text">Serializability theory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#conflict-conflict-equivalent-conflict-serializable"><span class="nav-number">2.1.1.</span> <span class="nav-text">conflict, conflict-equivalent, conflict-serializable</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#precedence-Graph"><span class="nav-number">2.1.2.</span> <span class="nav-text">precedence Graph</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Locking"><span class="nav-number">3.</span> <span class="nav-text">Locking</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-phase-locking"><span class="nav-number">3.1.</span> <span class="nav-text">2-phase locking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#several-lock-models"><span class="nav-number">3.2.</span> <span class="nav-text">several lock models</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hierarchical-Locking"><span class="nav-number">3.3.</span> <span class="nav-text">Hierarchical Locking</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deal-with-deadlocks"><span class="nav-number">4.</span> <span class="nav-text">Deal with deadlocks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Isolation-levels"><span class="nav-number">5.</span> <span class="nav-text">Isolation levels</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin HU</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
